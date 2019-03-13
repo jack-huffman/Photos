@@ -22,6 +22,7 @@ class PhotoViewController: UIImagePickerController, UIImagePickerControllerDeleg
     @IBAction func takePhoto(_ sender: UIBarButtonItem) {
        
         guard PhotoViewController.isSourceTypeAvailable(.camera) else {
+            
             let alert = UIAlertController(title: "Camera not found", message: "The camera could not be found for this device", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
@@ -32,10 +33,11 @@ class PhotoViewController: UIImagePickerController, UIImagePickerControllerDeleg
         imagePicker.allowsEditing = true
         imagePicker.delegate = self
         
-        self.present(imagePicker, animated: true)
+        present(imagePicker, animated: true)
     }
     
     @IBAction func selectPhoto(_ sender: UIBarButtonItem) {
+        
         guard PhotoViewController.isSourceTypeAvailable(.photoLibrary) else {
             let alert = UIAlertController(title: "Photo Library not found", message: "The Photo Library could not be found for this device", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
@@ -44,25 +46,26 @@ class PhotoViewController: UIImagePickerController, UIImagePickerControllerDeleg
         }
         
         imagePicker.sourceType = .photoLibrary
-        imagePicker.allowsEditing = true
         imagePicker.delegate = self
         
-        self.present(imagePicker, animated: true)
+        present(imagePicker, animated: true)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        picker.dismiss(animated: true, completion: { () in
-            
-            // get image
-            guard let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else {
-                print("No image found")
-                return
-            }
-            self.imageView.image = image
-        })
+        
+        defer {
+            picker.dismiss(animated: true)
+        }
+       
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            imageView.image = image
+            return
+        }
+        print("Image couldn't be opened")
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        
         defer {
             picker.dismiss(animated: true)
         }
